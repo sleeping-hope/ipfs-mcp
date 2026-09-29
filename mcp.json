@@ -1,0 +1,16 @@
+{
+  "name": "ipfs-mcp",
+  "version": "0.1.0",
+  "description": "Generic MCP interface for IPFS/Kubo with Hila and Bacalhau adapter boundaries.",
+  "transport": "stdio",
+  "runtime": {
+    "source_of_truth": "github",
+    "local_installation": false,
+    "update_model": "pull-current-revision"
+  },
+  "providers": {
+    "ipfs": {"type": "kubo-rpc", "endpoint_env": "IPFS_API_URL", "default": "http://127.0.0.1:5001"},
+    "hila": {"type": "adapter", "endpoint_env": "HILA_API_URL"},
+    "bacalhau": {"type": "adapter", "endpoint_env": "BACALHAU_API_URL"}
+  }
+}
