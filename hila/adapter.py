@@ -1,20 +1,28 @@
-import httpx
-
 class HilaAdapter:
-    """Provider-neutral boundary for Hila."""
+    """Provider-neutral boundary for Hila.
+
+    The concrete Hila transport is intentionally not assumed until its exact
+    API contract is configured.
+    """
+
     def __init__(self, endpoint: str | None):
         self.endpoint = endpoint.rstrip("/") if endpoint else None
 
     def status(self) -> dict:
-        return {"configured": bool(self.endpoint), "endpoint": self.endpoint, "adapter": "hila"}
+        return {
+            "configured": bool(self.endpoint),
+            "endpoint": self.endpoint,
+            "adapter": "hila",
+            "transport_ready": False,
+            "reason": "Concrete Hila API contract not configured",
+        }
 
     def send(self, cid: str, operation: str, payload: dict) -> dict:
-        if not self.endpoint:
-            return {"accepted": False, "configured": False, "cid": cid, "operation": operation, "reason": "HILA_API_URL is not configured"}
-        response = httpx.post(
-            f"{self.endpoint}/send",
-            json={"cid": cid, "operation": operation, "payload": payload},
-            timeout=60,
-        )
-        response.raise_for_status()
-        return response.json()
+        return {
+            "accepted": False,
+            "configured": bool(self.endpoint),
+            "cid": cid,
+            "operation": operation,
+            "payload": payload,
+            "reason": "Concrete Hila API contract must be defined before transport execution",
+        }
