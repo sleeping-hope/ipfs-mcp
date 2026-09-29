@@ -1,0 +1,3 @@
+from .client import IPFSClient
+
+__all__ = ["IPFSClient"]
