@@ -1,32 +1,36 @@
-import httpx
-
 class BacalhauClient:
-    """Provider-neutral Bacalhau adapter."""
+    """Provider-neutral Bacalhau adapter.
+
+    Concrete Bacalhau API/CLI semantics are intentionally not guessed here.
+    """
+
     def __init__(self, endpoint: str | None):
         self.endpoint = endpoint.rstrip("/") if endpoint else None
 
     def status(self, job_id: str | None = None) -> dict:
-        if job_id is None:
-            return {"configured": bool(self.endpoint), "endpoint": self.endpoint, "adapter": "bacalhau"}
-        return self._get(job_id, "status")
+        return {
+            "configured": bool(self.endpoint),
+            "endpoint": self.endpoint,
+            "adapter": "bacalhau",
+            "job_id": job_id,
+            "transport_ready": False,
+            "reason": "Concrete Bacalhau API/CLI contract not configured",
+        }
 
     def submit(self, cid: str, command: str, parameters: dict) -> dict:
-        if not self.endpoint:
-            return {"accepted": False, "configured": False, "input_cid": cid, "command": command, "reason": "BACALHAU_API_URL is not configured"}
-        response = httpx.post(
-            f"{self.endpoint}/jobs",
-            json={"input_cid": cid, "command": command, "parameters": parameters},
-            timeout=60,
-        )
-        response.raise_for_status()
-        return response.json()
-
-    def _get(self, job_id: str, suffix: str) -> dict:
-        if not self.endpoint:
-            return {"configured": False, "job_id": job_id, "reason": "BACALHAU_API_URL is not configured"}
-        response = httpx.get(f"{self.endpoint}/jobs/{job_id}/{suffix}", timeout=60)
-        response.raise_for_status()
-        return response.json()
+        return {
+            "accepted": False,
+            "configured": bool(self.endpoint),
+            "input_cid": cid,
+            "command": command,
+            "parameters": parameters,
+            "reason": "Concrete Bacalhau API/CLI contract must be defined before transport execution",
+        }
 
     def output(self, job_id: str) -> dict:
-        return self._get(job_id, "output")
+        return {
+            "job_id": job_id,
+            "configured": bool(self.endpoint),
+            "transport_ready": False,
+            "reason": "Concrete Bacalhau API/CLI contract not configured",
+        }
