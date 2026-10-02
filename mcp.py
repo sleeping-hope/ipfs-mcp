@@ -4,7 +4,7 @@ from mcp.server import MCPServer
 from ipfs.client import IPFSClient
 from hila.adapter import HilaAdapter
 from bacalhau.client import BacalhauClient
-from runtime.update import update_status
+from runtime import update as runtime_update
 
 mcp = MCPServer(
     "ipfs-mcp",
@@ -67,7 +67,7 @@ def bacalhau_output(job_id: str) -> dict:
 @mcp.tool()
 def update_status() -> dict:
     """Check the latest repository revision for runtime updating."""
-    return update_status()
+    return runtime_update.update_status()
 
 @mcp.tool()
 def connection_status() -> dict:
@@ -76,7 +76,7 @@ def connection_status() -> dict:
         "ipfs": ipfs.health(),
         "hila": hila.status(),
         "bacalhau": bacalhau.status(),
-        "update": update_status(),
+        "update": runtime_update.update_status(),
         "version": "0.1.0",
     }
 
